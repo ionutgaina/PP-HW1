@@ -12,7 +12,6 @@ object Solution {
 
   // prerequisites
   def fromStringPPM(image: List[Char]): Image = {
-    println(image);
     // Remove the newlines from the list of chars
     val withoutNewLine = image.foldRight(Nil: List[Sir])(opSplit('\n'));
 
@@ -34,8 +33,6 @@ object Solution {
 
     // Group the list of pixels into a matrix
     val pixelMatrix = pixelList.grouped(length).toList;
-
-    //    println(pixelMatrix)
     pixelMatrix;
   }
 
@@ -56,7 +53,9 @@ object Solution {
   }
 
   // ex 2
-  def horizontalConcat(image1: Image, image2: Image): Image = ???
+  def horizontalConcat(image1: Image, image2: Image): Image = {
+    image1.zip(image2).map(e => e._1 ++ e._2)
+  }
 
   // ex 3
   def rotate(image: Image, degrees: Integer): Image = ???
