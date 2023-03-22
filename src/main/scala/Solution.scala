@@ -1,5 +1,7 @@
 import util.MyUtil.{Sir, opSplit}
 import util.Pixel
+import util.Util
+import util.Util.{getNeighbors, toGrayScale}
 
 // Online viewer: https://0xc0de.fr/webppm/
 object Solution {
@@ -70,9 +72,50 @@ object Solution {
     }
   }
 
-  def edgeDetection(image: Image, threshold: Double): Image = ???
+  def edgeDetection(image: Image, threshold: Double): Image = {
+    /*
+    * Convert a image to a grayscale image
+    * using the util function toGrayScale
+     */ def toGrayScaleImage(image: Image): GrayscaleImage = {
+      image.map(list => list.map(pixel => toGrayScale(pixel)))
+    }
 
-  def applyConvolution(image: GrayscaleImage, kernel: GrayscaleImage): GrayscaleImage = ???
+    val gaussianBlurKernel: GrayscaleImage = List[List[Double]](List(1, 4, 7, 4, 1), List(4, 16, 26, 16, 4), List(7, 26, 41, 26, 7), List(4, 16, 26, 16, 4), List(1, 4, 7, 4, 1)).map(_.map(_ / 273))
+
+    // convert the image to grayscale
+    val grayImage = toGrayScaleImage(image)
+
+    // apply the gaussian blur
+    val blurredImage = applyConvolution(grayImage, gaussianBlurKernel)
+
+    val Gx: GrayscaleImage = List(List(-1, 0, 1), List(-2, 0, 2), List(-1, 0, 1))
+
+    // apply Gx
+    val Mx = applyConvolution(blurredImage, Gx)
+
+    val Gy: GrayscaleImage = List(List(1, 2, 1), List(0, 0, 0), List(-1, -2, -1))
+
+    // apply Gy
+    val My = applyConvolution(blurredImage, Gy)
+
+    // apply the threshold
+    Mx.zip(My).map(e => e._1.zip(e._2).map(e => {
+      if (Math.abs(e._1) + Math.abs(e._2) > threshold) {
+        Pixel(255, 255, 255)
+      } else {
+        Pixel(0, 0, 0)
+      }
+    }))
+  }
+
+  def applyConvolution(image: GrayscaleImage, kernel: GrayscaleImage): GrayscaleImage = {
+    val radius = kernel.length / 2
+    val neighbors = getNeighbors(image, radius)
+
+    neighbors.map(row => row.map(neighbor => {
+      neighbor.zip(kernel).map(e => e._1.zip(e._2).map(e => e._1 * e._2).sum).sum
+    }))
+  }
 
   // ex 5
   def moduloPascal(m: Integer, funct: Integer => Pixel, size: Integer): Image = ???
