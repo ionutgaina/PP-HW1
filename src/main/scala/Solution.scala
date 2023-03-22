@@ -43,7 +43,6 @@ object Solution {
     val header = "P3\n" + length + " " + width + "\n255\n";
     val body = image.map(list => list.map(pixel => pixel.red + " " + pixel.green + " " + pixel.blue + "\n").fold("")(_ + "" + _)).fold("")(_ + "" + _);
     val result = (header + body).toList;
-    println(result);
     result
   }
 
@@ -58,7 +57,18 @@ object Solution {
   }
 
   // ex 3
-  def rotate(image: Image, degrees: Integer): Image = ???
+  def rotate(image: Image, degrees: Integer): Image = {
+    def rotate90(image: Image): Image = {
+      image.transpose.reverse
+    }
+
+    degrees % 360 match {
+      case 90 => rotate90(image)
+      case 180 => rotate90(rotate90(image))
+      case 270 => rotate90(rotate90(rotate90(image)))
+      case _ => image
+    }
+  }
 
   def edgeDetection(image: Image, threshold: Double): Image = ???
 
