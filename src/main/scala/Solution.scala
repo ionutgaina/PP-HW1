@@ -1,7 +1,8 @@
 import util.MyUtil.{Sir, opSplit}
 import util.Pixel
-import util.Util
 import util.Util.{getNeighbors, toGrayScale}
+
+import scala.annotation.tailrec
 
 // Online viewer: https://0xc0de.fr/webppm/
 object Solution {
@@ -119,27 +120,44 @@ object Solution {
 
   // ex 5
   def moduloPascal(m: Integer, funct: Integer => Pixel, size: Integer): Image = {
-    def combination(k: Integer,n: Integer): Integer = {
-      if (k <= 0 || k >= n) {
-        1
-      }
-      else {
-        (combination(k, n-1) % m + combination(k - 1, n-1) % m) % m
+    @tailrec
+    def pascalTriangle(n: Int, acc: List[List[Int]]): List[List[Int]] = {
+      if (n == 0) {
+        acc
+      } else {
+        val precRow = acc.last
+        val newRow = precRow.zip(precRow.tail).map(e => (e._1 + e._2) % m)
+        pascalTriangle(n - 1, acc :+ (1 +: newRow :+ 1))
       }
     }
 
-    def pascalRow(n: Integer): List[Pixel] = {
-        (0 until size).map(k =>
-          if ( k <= n ) {
-            funct(combination(k, n))
-          }
-          else {
-            Pixel(0, 0, 0)
-          }).toList
+    /*
+    * Create a list of black pixels
+    * @param n the number of black pixels to create
+    * @return a list of black pixels
+     */
+    def blackListPixels(n: Int): List[Pixel] = {
+      @tailrec
+      def blackListPixelsRec(n: Int, acc: List[Pixel]): List[Pixel] = {
+        if (n == 0) {
+          acc
+        } else {
+          blackListPixelsRec(n - 1, Pixel(0, 0, 0) :: acc)
+        }
       }
+      blackListPixelsRec(n, Nil)
+    }
 
+    // get the pascal triangle as a list of lists of integers
+    val intPascal = pascalTriangle(size - 1, List(List(1)))
 
-    (0 until size).map(n => pascalRow(n)).toList
+    // transform the pascal triangle into a list of lists of pixels
+    val pixelPascal = intPascal.map(list => list.map(e => funct(e)))
+
+    // complete the pascal triangle with black pixels
+    val completePascal = pixelPascal.map(list => list ++ blackListPixels(size - list.length));
+
+    completePascal
   }
 
 
