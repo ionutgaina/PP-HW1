@@ -118,5 +118,29 @@ object Solution {
   }
 
   // ex 5
-  def moduloPascal(m: Integer, funct: Integer => Pixel, size: Integer): Image = ???
+  def moduloPascal(m: Integer, funct: Integer => Pixel, size: Integer): Image = {
+    def combination(k: Integer,n: Integer): Integer = {
+      if (k <= 0 || k >= n) {
+        1
+      }
+      else {
+        (combination(k, n-1) % m + combination(k - 1, n-1) % m) % m
+      }
+    }
+
+    def pascalRow(n: Integer): List[Pixel] = {
+        (0 until size).map(k =>
+          if ( k <= n ) {
+            funct(combination(k, n))
+          }
+          else {
+            Pixel(0, 0, 0)
+          }).toList
+      }
+
+
+    (0 until size).map(n => pascalRow(n)).toList
+  }
+
+
 }
