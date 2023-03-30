@@ -18,22 +18,13 @@ object Solution {
     // Remove the newlines from the list of chars
     val withoutNewLine = image.foldRight(Nil: List[Sir])(opSplit('\n'));
 
-
-    //Get the row where is size of the image
-    //Make the list of chars into a string
-    val sizeRow = {
-      withoutNewLine.slice(1, 2).map(list => list.fold("")(_ + "" + _)).map(e => e.toString)
-    };
-
     // Get the length of the image
-    val length = sizeRow.map(e => e.split(" ")).map(e => e(0).toInt).head;
+    val length = withoutNewLine.drop(1).head.foldRight("")(_ + "" + _).split(" ")(0).toInt;
 
     // Get the list of pixels (as strings)
-    val stringList = withoutNewLine.drop(3).map(list => list.fold("")(_ + "" + _)).map(e => e.toString);
-
+    val pixelsString = withoutNewLine.drop(3).map(list => list.fold("")(_ + "" + _)).map(e => e.toString);
     // Get the list of pixels (as Pixel objects)
-    val pixelList = stringList.map(e => e.split(" ")).map(e => Pixel(e(0).toInt, e(1).toInt, e(2).toInt));
-
+    val pixelList = pixelsString.map(e => e.split(" ")).map(e => Pixel(e(0).toInt, e(1).toInt, e(2).toInt));
     // Group the list of pixels into a matrix
     val pixelMatrix = pixelList.grouped(length).toList;
     pixelMatrix;
